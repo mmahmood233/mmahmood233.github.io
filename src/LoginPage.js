@@ -11,7 +11,7 @@ const LoginPage = () => {
     event.preventDefault();
   
     try {
-      const response = await fetch('https://((DOMAIN))/api/auth/signin', {
+      const response = await fetch('https://learn.reboot01.com/api/auth/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -19,6 +19,7 @@ const LoginPage = () => {
         },
         body: JSON.stringify({ username, password })
       });
+      
   
       if (!response.ok) {
         const errorText = await response.text();
