@@ -61,40 +61,45 @@ async function fetchProfile() {
 
 function updateProfileUI(profileData) {
     const profileDiv = document.getElementById('profile');
-    if (!profileDiv) {
-        console.error('Profile div not found');
-        return;
-    }
-
     profileDiv.innerHTML = `
-        <h2>Welcome, ${profileData.login}!</h2>
-        <h3>User ID: ${profileData.id}</h3>
+        <div class="profile-section card">
+            <h2>Welcome, ${profileData.login}!</h2>
+            <p>User ID: ${profileData.id}</p>
+        </div>
         
-        <h3>Recent Transactions:</h3>
-        <ul>
-            ${profileData.transactions.slice(0, 5).map(t => `
-                <li>${new Date(t.createdAt).toLocaleDateString()}: ${t.type} - ${t.amount} XP</li>
-            `).join('')}
-        </ul>
+        <div class="profile-section card">
+            <h3>Recent Transactions</h3>
+            <ul>
+                ${profileData.transactions.slice(0, 5).map(t => `
+                    <li>${new Date(t.createdAt).toLocaleDateString()}: ${t.type} - ${t.amount} XP</li>
+                `).join('')}
+            </ul>
+        </div>
         
-        <h3>Recent Progress:</h3>
-        <ul>
-            ${profileData.progresses.slice(0, 5).map(p => `
-                <li>${new Date(p.createdAt).toLocaleDateString()}: ${p.object.name} - Grade: ${p.grade}</li>
-            `).join('')}
-        </ul>
+        <div class="profile-section card">
+            <h3>Recent Progress</h3>
+            <ul>
+                ${profileData.progresses.slice(0, 5).map(p => `
+                    <li>${new Date(p.createdAt).toLocaleDateString()}: ${p.object.name} - Grade: ${p.grade}</li>
+                `).join('')}
+            </ul>
+        </div>
         
-        <div id="xp-graph"></div>
-        <div id="project-success-graph"></div>
+        <div class="profile-section card">
+            <h3>XP Over Time</h3>
+            <div id="xp-graph"></div>
+        </div>
         
-        <button id="logout-button">Logout</button>
+        <div class="profile-section card">
+            <h3>Project Success Rate</h3>
+            <div id="project-success-graph"></div>
+        </div>
+        
+        <button id="logout-button" onclick="handleLogout()">Logout</button>
     `;
     
     createXPGraph(profileData.transactions);
     createProjectSuccessGraph(profileData.progresses);
-    
-    console.log('Profile UI updated');
 }
-
 // Log that the script has loaded
 console.log('profile.js loaded and executed');
