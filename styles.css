@@ -1,0 +1,168 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.error-message {
+  color: red;
+  margin-top: 1rem;
+}
+
+/* ... (previous styles remain the same) */
+
+.audit-display {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.audit-bars {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.audit-bar-container {
+  background-color: #333;
+  height: 10px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+
+.audit-bar {
+  height: 100%;
+  border-radius: 5px;
+}
+
+.done-bar {
+  background-color: #FFA500;
+}
+
+.received-bar {
+  background-color: #FFFFFF;
+}
+
+.audit-values {
+  text-align: right;
+}
+
+.audit-value {
+  margin-bottom: 5px;
+}
+
+.audit-label {
+  display: block;
+  font-size: 0.8em;
+  color: #888;
+}
+
+.audit-ratio {
+  margin-top: 10px;
+}
+
+.ratio-value {
+  font-size: 2em;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.ratio-message {
+  color: #FFA500;
+}
+
+
+/* ... (previous styles remain the same) */
+
+#transaction-history {
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px auto;
+  max-width: 800px;
+}
+
+#transaction-history h2 {
+  color: #fff;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+}
+
+.transaction-project {
+  color: #fff;
+  font-size: 16px;
+  flex: 2;
+}
+
+.transaction-amount {
+  color: #fff;
+  font-size: 16px;
+  flex: 1;
+  text-align: right;
+}
+
+.transaction-date {
+  color: #999;
+  font-size: 14px;
+  flex: 1;
+  text-align: right;
+}
+
+/* Remove any styles related to the skills chart if they exist */
+
+/* ... (rest of the styles remain the same) */
+

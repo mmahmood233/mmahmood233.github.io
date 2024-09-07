@@ -3,29 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GraphQL Profile</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css-html/styles.css">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-    <div id="app">
-        <div id="login-form" class="card">
-            <h2>Graphql</h2>
-            <form id="auth-form">
-                <input type="text" id="username" placeholder="Username or Email" required>
-                <input type="password" id="password" placeholder="Password" required>
+    <div class="container">
+        <div id="login-view">
+            <h2>Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
                 <button type="submit">Login</button>
             </form>
             <p id="error-message"></p>
         </div>
-        <div id="profile" style="display: none;">
-            <!-- Profile content will be dynamically inserted here -->
+
+        <div id="profile-view" style="display: none;">
+            <header>
+                <h1>User Profile</h1>
+                <button id="logout-btn">Logout</button>
+            </header>
+            <main id="profile-content">
+                <section id="user-info" class="profile-section">
+                    <img id="user-icon" alt="User Icon">
+                    <h2 id="user-name"></h2>
+                    <p>Level: <span id="user-level"></span></p>
+                </section>
+                
+                <section id="transaction-history" class="profile-section">
+                    <h2>Transactions history</h2>
+                    <div id="transaction-list"></div>
+                </section>
+                
+<!-- ... (previous HTML remains the same) -->
+
+<section id="audit-ratio" class="profile-section">
+    <h3>Audits ratio</h3>
+    <div class="audit-display">
+        <div class="audit-bars">
+            <div class="audit-bar-container">
+                <div id="done-bar" class="audit-bar done-bar"></div>
+            </div>
+            <div class="audit-bar-container">
+                <div id="received-bar" class="audit-bar received-bar"></div>
+            </div>
+        </div>
+        <div class="audit-values">
+            <div class="audit-value">
+                <span id="done-value"></span> kB
+                <span class="audit-label">Done ↑</span>
+            </div>
+            <div class="audit-value">
+                <span id="received-value"></span> kB
+                <span class="audit-label">Received ↓</span>
+            </div>
         </div>
     </div>
-    <script src="js/auth.js"></script>
-    <script src="js/graphs.js"></script>
-    <script src="js/profile.js"></script>
-    <script src="js/app.js"></script>
+    <div class="audit-ratio">
+        <span id="audit-ratio-value" class="ratio-value"></span>
+        <span id="audit-message" class="ratio-message"></span>
+    </div>
+</section>
+
+
+<!-- ... (rest of the HTML remains the same) -->
+            </main>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+    <script src="profile.js"></script>
+    <script src="main.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="xp-progression.js"></script>
+<script>
+    window.addEventListener('load', () => initXPProgressionChart());
+</script>
 </body>
 </html>
