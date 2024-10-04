@@ -263,3 +263,27 @@ p {
     flex-direction: column;
   }
 }
+
+#xp-chart {
+    background-color: #1e1e1e;
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+#xp-chart select {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+}
+
+#xp-chart .domain,
+#xp-chart .tick line {
+    stroke: #666;
+}
+
+#xp-chart .tick text {
+    fill: #999;
+}
