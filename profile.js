@@ -13,15 +13,9 @@ function fetchUserData() {
             totalUp
             totalDown
             auditRatio
-            transactions(
-                order_by: [{ type: desc }, { amount: desc }]
-                distinct_on: [type]
-                where: {
-                    type: { _in: ["skill_js", "skill_go", "skill_html", "skill_prog", "skill_front-end", "skill_back-end"] }
-                }
-            ) {
-                type
+            transactions(where: {type: {_eq: "xp"}}, order_by: {createdAt: asc}) {
                 amount
+                createdAt
             }
         }
         event_user(where: {eventId: {_eq: 20}}) {
@@ -50,8 +44,6 @@ function fetchUserData() {
         showLoginView();
     });
 }
-
-// ... (previous code remains the same)
 
 function displayUserData(data) {
     const user = data.user[0];
@@ -91,10 +83,6 @@ function updateAuditRatio(totalUp, totalDown, auditRatio) {
         ratioMessage.textContent = "Great job!";
     }
 }
-
-// ... (rest of the code remains the same)
-
-// ... (previous code remains the same)
 
 function fetchUserData() {
     const token = localStorage.getItem('jwtToken');
@@ -154,6 +142,8 @@ function displayUserData(data) {
 
     updateAuditRatio(user.totalUp, user.totalDown, user.auditRatio);
     displayTransactionHistory(user.transactions);
+    createAuditChart(user.totalUp, user.totalDown);
+    createXPProgressChart(user.transactions);
 }
 
 function displayTransactionHistory(transactions) {
@@ -184,8 +174,6 @@ function displayTransactionHistory(transactions) {
         transactionList.appendChild(transactionItem);
     });
 }
-
-// ... (rest of the code remains the same)
 
 function createAuditChart(totalUp, totalDown) {
     const width = 300;
@@ -243,4 +231,111 @@ function showLoginView() {
     // Implementation depends on your specific setup
     console.log("Showing login view");
     // You might want to redirect to login page or show/hide specific elements
+}
+
+function createAuditChart(totalUp, totalDown) {
+    const width = 300;
+    const height = 200;
+    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+
+    d3.select("#audit-chart").selectAll("*").remove();
+
+    const svg = d3.select("#audit-chart")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scaleBand()
+        .range([0, width - margin.left - margin.right])
+        .padding(0.1);
+
+    const y = d3.scaleLinear()
+        .range([height - margin.top - margin.bottom, 0]);
+
+    const data = [
+        { label: "Done", value: totalUp },
+        { label: "Received", value: totalDown }
+    ];
+
+    x.domain(data.map(d => d.label));
+    y.domain([0, d3.max(data, d => d.value)]);
+
+    svg.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", d => x(d.label))
+        .attr("width", x.bandwidth())
+        .attr("y", d => y(d.value))
+        .attr("height", d => height - margin.top - margin.bottom - y(d.value))
+        .attr("fill", (d, i) => i === 0 ? "#4CAF50" : "#2196F3");
+
+    svg.append("g")
+        .attr("transform", `translate(0,${height - margin.top - margin.bottom})`)
+        .call(d3.axisBottom(x));
+
+    svg.append("g")
+        .call(d3.axisLeft(y).ticks(5));
+}
+
+function createXPProgressChart(transactions) {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.getElementById('xp-chart');
+    svg.setAttribute("width", "400");
+    svg.setAttribute("height", "200");
+
+    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+    const width = 400 - margin.left - margin.right;
+    const height = 200 - margin.top - margin.bottom;
+
+    // Clear existing content
+    svg.innerHTML = '';
+
+    // Sort transactions by date
+    transactions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    // Calculate cumulative XP
+    let cumulativeXP = 0;
+    const data = transactions.map(t => {
+        cumulativeXP += t.amount;
+        return { date: new Date(t.createdAt), xp: cumulativeXP };
+    });
+
+    const xScale = d3.scaleTime()
+        .domain(d3.extent(data, d => d.date))
+        .range([0, width]);
+
+    const yScale = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.xp)])
+        .range([height, 0]);
+
+    const line = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => yScale(d.xp));
+
+    const g = document.createElementNS(svgNS, "g");
+    g.setAttribute("transform", `translate(${margin.left},${margin.top})`);
+    svg.appendChild(g);
+
+    // Create the line path
+    const path = document.createElementNS(svgNS, "path");
+    path.setAttribute("d", line(data));
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", "steelblue");
+    g.appendChild(path);
+
+    // Create x-axis
+    const xAxis = document.createElementNS(svgNS, "g");
+    xAxis.setAttribute("transform", `translate(0,${height})`);
+    g.appendChild(xAxis);
+
+    // Create y-axis
+    const yAxis = document.createElementNS(svgNS, "g");
+    g.appendChild(yAxis);
+
+    // Use D3 to render the axes
+    d3.select(xAxis).call(d3.axisBottom(xScale));
+    d3.select(yAxis).call(d3.axisLeft(yScale));
 }
