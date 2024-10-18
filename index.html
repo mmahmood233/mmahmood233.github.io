@@ -6,6 +6,7 @@
     <title>User Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
     <div class="container">
@@ -24,7 +25,7 @@
             </form>
             <p id="error-message"></p>
         </div>
-
+        
         <div id="profile-view" style="display: none;">
             <header>
                 <h1>User Profile</h1>
@@ -42,48 +43,45 @@
                     <div id="transaction-list"></div>
                 </section>
                 
-<section id="audit-ratio" class="profile-section">
-    <h3>Audits ratio</h3>
-    <div id="audit-chart"></div>
-    <div class="audit-display">
-        <div class="audit-bars">
-            <div class="audit-bar-container">
-                <div id="done-bar" class="audit-bar done-bar"></div>
-            </div>
-            <div class="audit-bar-container">
-                <div id="received-bar" class="audit-bar received-bar"></div>
-            </div>
-        </div>
-        <div class="audit-values">
-            <div class="audit-value">
-                <span id="done-value"></span> kB
-                <span class="audit-label">Done ↑</span>
-            </div>
-            <div class="audit-value">
-                <span id="received-value"></span> kB
-                <span class="audit-label">Received ↓</span>
-            </div>
-        </div>
-    </div>
-    <div class="audit-ratio">
-        <span id="audit-ratio-value" class="ratio-value"></span>
-        <span id="audit-message" class="ratio-message"></span>
-    </div>
-</section>
-
-<section id="xp-progress" class="profile-section">
-    <h3>XP Progress Over Time</h3>
-    <svg id="xp-chart"></svg>
-</section>
-
-
+                <section id="audit-ratio" class="profile-section">
+                    <h3>Audits ratio</h3>
+                    <div id="audit-chart"></div>
+                    <div class="audit-display">
+                        <div class="audit-bars">
+                            <div class="audit-bar-container">
+                                <div id="done-bar" class="audit-bar done-bar"></div>
+                            </div>
+                            <div class="audit-bar-container">
+                                <div id="received-bar" class="audit-bar received-bar"></div>
+                            </div>
+                        </div>
+                        <div class="audit-values">
+                            <div class="audit-value">
+                                <span id="done-value"></span> kB
+                                <span class="audit-label">Done ↑</span>
+                            </div>
+                            <div class="audit-value">
+                                <span id="received-value"></span> kB
+                                <span class="audit-label">Received ↓</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="audit-ratio">
+                        <span id="audit-ratio-value" class="ratio-value"></span>
+                        <span id="audit-message" class="ratio-message"></span>
+                    </div>
+                </section>
+                
+                <section id="skills-chart" class="profile-section">
+                    <h3>Skill Distribution</h3>
+                    <div id="skillPolarChart"></div>
+                </section>
             </main>
         </div>
     </div>
-
+    
     <script src="login.js"></script>
     <script src="profile.js"></script>
     <script src="main.js"></script>
-
 </body>
 </html>

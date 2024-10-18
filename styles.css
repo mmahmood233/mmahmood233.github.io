@@ -269,14 +269,11 @@ p {
     color: white;
     padding: 20px;
     border-radius: 5px;
+    position: relative;
 }
 
-#xp-chart select {
-    background-color: #333;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    margin-bottom: 10px;
+#xp-chart svg {
+    display: block;
 }
 
 #xp-chart .domain,
@@ -286,4 +283,24 @@ p {
 
 #xp-chart .tick text {
     fill: #999;
+}
+
+#xp-chart select {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.tooltip {
+    position: absolute;
+    text-align: center;
+    padding: 5px;
+    font: 12px sans-serif;
+    background: #333;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    color: white;
 }

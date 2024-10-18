@@ -13,9 +13,18 @@ function fetchUserData() {
             totalUp
             totalDown
             auditRatio
-            transactions(where: {type: {_eq: "xp"}}, order_by: {createdAt: asc}) {
+            transactions(where: {type: {_eq: "xp"}}, order_by: {createdAt: desc}, limit: 10) {
                 amount
                 createdAt
+                path
+            }
+            skills: transactions(
+                order_by: [{type: desc}, {amount: desc}]
+                distinct_on: [type]
+                where: {type: {_in: ["skill_js", "skill_go", "skill_html", "skill_prog", "skill_front-end", "skill_back-end"]}}
+            ) {
+                type
+                amount
             }
         }
         event_user(where: {eventId: {_eq: 20}}) {
@@ -46,6 +55,8 @@ function fetchUserData() {
 }
 
 function displayUserData(data) {
+    console.log("Displaying user data:", data);
+
     const user = data.user[0];
     const level = data.event_user[0]?.level || 'N/A';
 
@@ -53,8 +64,10 @@ function displayUserData(data) {
     document.getElementById('user-level').textContent = level;
     document.getElementById('user-icon').src = `https://avatars.githubusercontent.com/${user.login}`;
 
-    createSkillsRadarChart(user.transactions);
     updateAuditRatio(user.totalUp, user.totalDown, user.auditRatio);
+    displayTransactionHistory(user.transactions);
+    createAuditChart(user.totalUp, user.totalDown);
+    displayUserSkills(user.skills);
 }
 
 function updateAuditRatio(totalUp, totalDown, auditRatio) {
@@ -82,68 +95,6 @@ function updateAuditRatio(totalUp, totalDown, auditRatio) {
     } else {
         ratioMessage.textContent = "Great job!";
     }
-}
-
-function fetchUserData() {
-    const token = localStorage.getItem('jwtToken');
-    if (!token) {
-        showLoginView();
-        return;
-    }
-
-    const query = `
-    {
-        user {
-            id
-            login
-            totalUp
-            totalDown
-            auditRatio
-            transactions(where: {type: {_eq: "xp"}}, order_by: {createdAt: desc}, limit: 10) {
-                amount
-                createdAt
-                path
-            }
-        }
-        event_user(where: {eventId: {_eq: 20}}) {
-            level
-        }
-    }
-    `;
-
-    fetch('https://learn.reboot01.com/api/graphql-engine/v1/graphql', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ query })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to fetch user data');
-        }
-        return response.json();
-    })
-    .then(data => displayUserData(data.data))
-    .catch(error => {
-        console.error('Error:', error);
-        showLoginView();
-    });
-}
-
-function displayUserData(data) {
-    const user = data.user[0];
-    const level = data.event_user[0]?.level || 'N/A';
-
-    document.getElementById('user-name').textContent = user.login;
-    document.getElementById('user-level').textContent = level;
-    document.getElementById('user-icon').src = `https://avatars.githubusercontent.com/${user.login}`;
-
-    updateAuditRatio(user.totalUp, user.totalDown, user.auditRatio);
-    displayTransactionHistory(user.transactions);
-    createAuditChart(user.totalUp, user.totalDown);
-    createXPProgressChart(user.transactions);
 }
 
 function displayTransactionHistory(transactions) {
@@ -244,69 +195,48 @@ function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-// This function should be defined in your main.js or wherever you handle view switching
-function showLoginView() {
-    // Implementation depends on your specific setup
-    console.log("Showing login view");
-    // You might want to redirect to login page or show/hide specific elements
-}
+function displayUserSkills(skills) {
+    // Transform and clean up skill types
+    const skillsData = skills.map(item => ({
+        type: item.type.split('_')[1].charAt(0).toUpperCase() + item.type.split('_')[1].slice(1),
+        amount: item.amount
+    }));
 
-function createXPProgressChart(transactions) {
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.getElementById('xp-chart');
-    svg.setAttribute("width", "400");
-    svg.setAttribute("height", "200");
-
-    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
-    const width = 400 - margin.left - margin.right;
-    const height = 200 - margin.top - margin.bottom;
-
-    // Clear existing content
-    svg.innerHTML = '';
-
-    // Sort transactions by date
-    transactions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-
-    // Calculate cumulative XP
-    let cumulativeXP = 0;
-    const data = transactions.map(t => {
-        cumulativeXP += t.amount;
-        return { date: new Date(t.createdAt), xp: cumulativeXP };
+    // Prepare data for Google Charts
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', 'Skill Type');
+    data.addColumn('number', 'Amount');
+    skillsData.forEach(item => {
+        data.addRow([item.type, item.amount]);
     });
 
-    const xScale = d3.scaleTime()
-        .domain(d3.extent(data, d => d.date))
-        .range([0, width]);
+    // Set chart options
+    const options = {
+        title: 'User Skills Distribution',
+        pieHole: 0.4,
+        colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+        legend: { position: 'right' },
+        chartArea: { width: '80%', height: '80%' },
+        pieSliceText: 'value'
+    };
 
-    const yScale = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.xp)])
-        .range([height, 0]);
+    // Initialize and render the donut chart
+    const chart = new google.visualization.PieChart(document.getElementById('skillPolarChart'));
+    chart.draw(data, options);
+}
 
-    const line = d3.line()
-        .x(d => xScale(d.date))
-        .y(d => yScale(d.xp));
+// Load Google Charts library
+google.charts.load('current', { 'packages': ['corechart'] });
+google.charts.setOnLoadCallback(fetchUserData);
 
-    const g = document.createElementNS(svgNS, "g");
-    g.setAttribute("transform", `translate(${margin.left},${margin.top})`);
-    svg.appendChild(g);
+function showLoginView() {
+    console.log("Showing login view");
+    document.getElementById('login-view').style.display = 'block';
+    document.getElementById('profile-view').style.display = 'none';
+}
 
-    // Create the line path
-    const path = document.createElementNS(svgNS, "path");
-    path.setAttribute("d", line(data));
-    path.setAttribute("fill", "none");
-    path.setAttribute("stroke", "steelblue");
-    g.appendChild(path);
-
-    // Create x-axis
-    const xAxis = document.createElementNS(svgNS, "g");
-    xAxis.setAttribute("transform", `translate(0,${height})`);
-    g.appendChild(xAxis);
-
-    // Create y-axis
-    const yAxis = document.createElementNS(svgNS, "g");
-    g.appendChild(yAxis);
-
-    // Use D3 to render the axes
-    d3.select(xAxis).call(d3.axisBottom(xScale));
-    d3.select(yAxis).call(d3.axisLeft(yScale));
+function showProfileView() {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('profile-view').style.display = 'block';
+    fetchUserData();
 }
