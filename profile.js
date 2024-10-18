@@ -83,18 +83,89 @@ function updateAuditRatio(totalUp, totalDown, auditRatio) {
     doneBar.style.width = `${(totalUp / maxValue) * 100}%`;
     receivedBar.style.width = `${(totalDown / maxValue) * 100}%`;
     
-    doneValue.textContent = Math.round(totalUp / 1000);
-    receivedValue.textContent = Math.round(totalDown / 1000);
+    const totalUpMB = (totalUp / (1024 * 1024)).toFixed(2);
+    const totalDownMB = (totalDown / (1024 * 1024)).toFixed(2);
+    
+    doneValue.textContent = `${totalUpMB} MB`;
+    receivedValue.textContent = `${totalDownMB} MB`;
     
     ratioValue.textContent = auditRatio.toFixed(1);
     
     if (auditRatio < 1) {
-        ratioMessage.textContent = "You can do better!";
+        ratioMessage.textContent = "Make more audits!";
     } else if (auditRatio === 1) {
         ratioMessage.textContent = "Perfect balance!";
     } else {
         ratioMessage.textContent = "Great job!";
     }
+
+    // Update SVG chart
+    createAuditChart(totalUp, totalDown);
+}
+
+function createAuditChart(totalUp, totalDown) {
+    const width = 300;
+    const height = 200;
+    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+
+    d3.select("#audit-chart").selectAll("*").remove();
+
+    const svg = d3.select("#audit-chart")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scaleBand()
+        .range([0, width - margin.left - margin.right])
+        .padding(0.1);
+
+    const y = d3.scaleLinear()
+        .range([height - margin.top - margin.bottom, 0]);
+
+    const data = [
+        { label: "Done", value: totalUp / 1000 },
+        { label: "Received", value: totalDown / 1000 }
+    ];
+
+    x.domain(data.map(d => d.label));
+    y.domain([0, Math.max(totalUp, totalDown) / 1000]);
+
+    svg.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", d => x(d.label))
+        .attr("width", x.bandwidth())
+        .attr("y", d => y(d.value))
+        .attr("height", d => height - margin.top - margin.bottom - y(d.value))
+        .attr("fill", (d, i) => i === 0 ? "#4CAF50" : "#2196F3");
+
+    svg.append("g")
+        .attr("transform", `translate(0,${height - margin.top - margin.bottom})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .style("fill", "white");
+
+    svg.append("g")
+        .call(d3.axisLeft(y)
+            .ticks(5)
+            .tickFormat(d => d3.format(",.0f")(d)))
+        .selectAll("text")
+        .style("fill", "white");
+
+    svg.selectAll(".domain, .tick line")
+        .style("stroke", "white");
+
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .style("fill", "white")
+        .text("kB");
 }
 
 function displayTransactionHistory(transactions) {

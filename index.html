@@ -7,76 +7,112 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="container">
-        <div id="login-view">
-            <h2>Login</h2>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" required>
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.png" alt="Logo" class="logo">
+                <h1>Dashboard</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#user-info" class="active"><i class="fas fa-user"></i> User Info</a></li>
+                <li><a href="#transaction-history"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
+                <li><a href="#audit-ratio"><i class="fas fa-balance-scale"></i> Audit Ratio</a></li>
+                <li><a href="#skills-chart"><i class="fas fa-chart-pie"></i> Skills</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn-secondary"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            </div>
+        </nav>
+
+        <main class="content">
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
                 </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit">Login</button>
-            </form>
-            <p id="error-message"></p>
-        </div>
-        
-        <div id="profile-view" style="display: none;">
-            <header>
-                <h1>User Profile</h1>
-                <button id="logout-btn">Logout</button>
-            </header>
-            <main id="profile-content">
-                <section id="user-info" class="profile-section">
+                <div class="user-info-header">
+                    <span id="user-name"></span>
                     <img id="user-icon" alt="User Icon">
-                    <h2 id="user-name"></h2>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <section id="user-info" class="profile-section card">
+                    <h2>User Information</h2>
                     <p>Level: <span id="user-level"></span></p>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <h3>XP Earned</h3>
+                            <p id="xp-earned"></p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>Projects Completed</h3>
+                            <p id="projects-completed"></p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>Audit Ratio</h3>
+                            <p id="audit-ratio-value"></p>
+                        </div>
+                    </div>
                 </section>
-                
-                <section id="transaction-history" class="profile-section">
-                    <h2>Transactions history</h2>
+
+                <section id="transaction-history" class="profile-section card">
+                    <h2>Transactions History</h2>
                     <div id="transaction-list"></div>
                 </section>
-                
-                <section id="audit-ratio" class="profile-section">
+
+                <section id="audit-ratio" class="profile-section card dark-card">
                     <h3>Audits ratio</h3>
-                    <div id="audit-chart"></div>
-                    <div class="audit-display">
-                        <div class="audit-bars">
-                            <div class="audit-bar-container">
-                                <div id="done-bar" class="audit-bar done-bar"></div>
-                            </div>
-                            <div class="audit-bar-container">
-                                <div id="received-bar" class="audit-bar received-bar"></div>
-                            </div>
-                        </div>
-                        <div class="audit-values">
-                            <div class="audit-value">
-                                <span id="done-value"></span> kB
-                                <span class="audit-label">Done ↑</span>
-                            </div>
-                            <div class="audit-value">
-                                <span id="received-value"></span> kB
-                                <span class="audit-label">Received ↓</span>
+                    <div class="audit-display-container">
+                        <div id="audit-chart" class="audit-chart"></div>
+                        <div class="audit-stats">
+                            <div class="ratio-value" id="audit-ratio-value">0.9</div>
+                            <div class="audit-bars">
+                                <div class="audit-bar-container">
+                                    <div class="audit-bar-label">Done ↑</div>
+                                    <div class="audit-bar-wrapper">
+                                        <div id="done-bar" class="audit-bar done-bar"></div>
+                                    </div>
+                                    <div class="audit-bar-value" id="done-value">1.14 MB</div>
+                                </div>
+                                <div class="audit-bar-container">
+                                    <div class="audit-bar-label">Received ↓</div>
+                                    <div class="audit-bar-wrapper">
+                                        <div id="received-bar" class="audit-bar received-bar"></div>
+                                    </div>
+                                    <div class="audit-bar-value" id="received-value">1.29 MB</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="audit-ratio">
-                        <span id="audit-ratio-value" class="ratio-value"></span>
-                        <span id="audit-message" class="ratio-message"></span>
-                    </div>
+                    <div id="audit-message" class="audit-message">Make more audits!</div>
                 </section>
-                
-                <section id="skills-chart" class="profile-section">
-                    <h3>Skill Distribution</h3>
+
+                <section id="skills-chart" class="profile-section card">
+                    <h2>Skill Distribution</h2>
                     <div id="skillPolarChart"></div>
                 </section>
-            </main>
+            </div>
+        </main>
+    </div>
+
+    <div id="login-view" class="modal">
+        <div class="modal-content card">
+            <h2>Sign In</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <input type="text" id="username" name="username" required placeholder="Username or Email">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="password" required placeholder="Password">
+                </div>
+                <button type="submit" class="btn-primary">Sign In</button>
+            </form>
+            <p id="error-message"></p>
         </div>
     </div>
     
