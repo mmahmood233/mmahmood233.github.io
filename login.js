@@ -34,7 +34,7 @@ async function login(username, password) {
         });
 
         if (!response.ok) {
-            throw new Error(`Invalid credentials. Status: ${response.status}`);
+            throw new Error(`Invalid Credentails, Try Again.`);
         }
 
         const data = await response.json();
@@ -44,3 +44,5 @@ async function login(username, password) {
         throw error;
     }
 }
+
+window.fetchUserData = fetchUserData;

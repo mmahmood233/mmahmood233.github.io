@@ -143,11 +143,11 @@ function updateAuditRatio(totalUp, totalDown, auditRatio) {
     ratioValue.textContent = auditRatio.toFixed(1);
     
     if (auditRatio < 1) {
-        ratioMessage.textContent = "Make more audits!";
+        ratioMessage.textContent = "MAKE MORE AUDITS!";
     } else if (auditRatio === 1) {
-        ratioMessage.textContent = "Perfect balance!";
+        ratioMessage.textContent = "WELL BALANCED!";
     } else {
-        ratioMessage.textContent = "Great job!";
+        ratioMessage.textContent = "GREAT JOB!";
     }
 
     // Update SVG chart
@@ -335,18 +335,42 @@ function displayUserSkills(skills) {
     // Set chart options
     const options = {
         title: 'User Skills Distribution',
+        titleTextStyle: { 
+            color: '#1D1D1F',
+            fontSize: 18,
+            fontName: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif',
+            bold: true
+        },
         pieHole: 0.4,
-        colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
-        legend: { position: 'right' },
+        colors: ['#007AFF', '#5AC8FA', '#FF9F40', '#FF3B30', '#5856D6', '#34C759'],
+        backgroundColor: '#FFFFFF',
+        legend: { 
+            position: 'right',
+            textStyle: { 
+                color: '#1D1D1F',
+                fontName: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif',
+            }
+        },
         chartArea: { width: '80%', height: '80%' },
-        pieSliceText: 'value'
+        pieSliceTextStyle: { 
+            color: '#FFFFFF',
+            fontName: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif',
+        },
+        pieSliceText: 'value',
+        tooltip: { 
+            trigger: 'none'  // This disables the hover tooltip
+        }
     };
 
     // Initialize and render the donut chart
     const chart = new google.visualization.PieChart(document.getElementById('skillPolarChart'));
     chart.draw(data, options);
-}
 
+    // Add responsiveness
+    window.addEventListener('resize', () => {
+        chart.draw(data, options);
+    });
+}
 // Load Google Charts library
 google.charts.load('current', { 'packages': ['corechart'] });
 google.charts.setOnLoadCallback(fetchUserData);
