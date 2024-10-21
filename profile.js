@@ -1,15 +1,45 @@
-function fetchUserData() {
+function isValidJWT(token) {
+    return token && typeof token === 'string' && token.split('.').length === 3;
+}
+
+function getUserIdFromToken(token) {
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload && payload.sub) {
+            return parseInt(payload.sub, 10);
+        }
+        throw new Error('User ID not found in token');
+    } catch (error) {
+        console.error('Error parsing token:', error);
+        throw new Error('Invalid token structure');
+    }
+}
+
+async function fetchUserData() {
     const token = localStorage.getItem('jwtToken');
-    if (!token) {
+    if (!isValidJWT(token)) {
+        localStorage.removeItem('jwtToken');
         showLoginView();
         return;
     }
 
+    let userId;
+    try {
+        userId = getUserIdFromToken(token);
+    } catch (error) {
+        console.error('Error getting user ID:', error);
+        showLoginView();
+        return;
+    }
+
+    const eventId = 20; // You might want to make this dynamic if needed
+
     const query = `
-    {
-        user {
+    query($userId: Int!, $eventId: Int!) {
+        user(where: {id: {_eq: $userId}}) {
             id
             login
+            email
             totalUp
             totalDown
             auditRatio
@@ -27,31 +57,46 @@ function fetchUserData() {
                 amount
             }
         }
-        event_user(where: {eventId: {_eq: 20}}) {
+        event_user(where: { userId: { _eq: $userId }, eventId: {_eq: $eventId}}) {
             level
         }
     }
     `;
 
-    fetch('https://learn.reboot01.com/api/graphql-engine/v1/graphql', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ query })
-    })
-    .then(response => {
+    try {
+        const response = await fetch('https://learn.reboot01.com/api/graphql-engine/v1/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ 
+                query: query,
+                variables: { userId: userId, eventId: eventId }
+            })
+        });
+
         if (!response.ok) {
             throw new Error('Failed to fetch user data');
         }
-        return response.json();
-    })
-    .then(data => displayUserData(data.data))
-    .catch(error => {
+
+        const data = await response.json();
+        console.log("Raw API response:", data);
+
+        if (data.errors) {
+            console.error("GraphQL Errors:", data.errors);
+            throw new Error('GraphQL query failed');
+        }
+
+        if (!data.data || !data.data.user || data.data.user.length === 0) {
+            throw new Error('No user data found');
+        }
+
+        displayUserData(data.data);
+    } catch (error) {
         console.error('Error:', error);
         showLoginView();
-    });
+    }
 }
 
 function displayUserData(data) {
@@ -61,14 +106,20 @@ function displayUserData(data) {
     const level = data.event_user[0]?.level || 'N/A';
 
     document.getElementById('user-name').textContent = user.login;
-    document.getElementById('user-level').textContent = level;
-    document.getElementById('user-icon').src = `https://avatars.githubusercontent.com/${user.login}`;
+    // document.getElementById('user-icon').src = `https://avatars.githubusercontent.com/${user.login}`;
 
+    // Update user info section
+    document.getElementById('user-level').textContent = level;
+    document.getElementById('user-email').textContent = user.email;
+    document.getElementById('user-id').textContent = user.id;
+    document.getElementById('user-audit-ratio').textContent = user.auditRatio.toFixed(1);
+
+    // Keep the existing functionality
     updateAuditRatio(user.totalUp, user.totalDown, user.auditRatio);
     displayTransactionHistory(user.transactions);
     createAuditChart(user.totalUp, user.totalDown);
     displayUserSkills(user.skills);
-}
+}   
 
 function updateAuditRatio(totalUp, totalDown, auditRatio) {
     const doneBar = document.getElementById('done-bar');
