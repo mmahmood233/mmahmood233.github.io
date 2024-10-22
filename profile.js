@@ -251,59 +251,75 @@ function formatNumber(num) {
 }
 
 function displayUserSkills(skills) {
-    // Transform and clean up skill types
     const skillsData = skills.map(item => ({
         type: item.type.split('_')[1].charAt(0).toUpperCase() + item.type.split('_')[1].slice(1),
         amount: item.amount
     }));
 
-    // Prepare data for Google Charts
-    const data = new google.visualization.DataTable();
-    data.addColumn('string', 'Skill Type');
-    data.addColumn('number', 'Amount');
-    skillsData.forEach(item => {
-        data.addRow([item.type, item.amount]);
-    });
+    const width = 400;
+    const height = 300;
+    const radius = Math.min(width, height) / 2;
 
-    // Set chart options
-    const options = {
-        title: 'User Skills Distribution',
-        titleTextStyle: { 
-            color: '#1D1D1F',
-            fontSize: 18,
-            fontName: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif',
-            bold: true
-        },
-        pieHole: 0.4,
-        colors: ['#007AFF', '#5AC8FA', '#FF9F40', '#FF3B30', '#5856D6', '#34C759'],
-        backgroundColor: '#FFFFFF',
-        legend: { 
-            position: 'right',
-            textStyle: { 
-                color: '#1D1D1F',
-                fontName: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif',
-            }
-        },
-        chartArea: { width: '80%', height: '80%' },
-        pieSliceTextStyle: { 
-            color: '#FFFFFF',
-            fontName: 'SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif',
-        },
-        pieSliceText: 'value',
-        tooltip: { 
-            trigger: 'none'  // This disables the hover tooltip
-        }
-    };
+    // Clear existing SVG elements
+    d3.select("#skillPolarChart").selectAll("*").remove();
 
-    // Initialize and render the donut chart
-    const chart = new google.visualization.PieChart(document.getElementById('skillPolarChart'));
-    chart.draw(data, options);
+    const svg = d3.select("#skillPolarChart")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-    // Add responsiveness
-    window.addEventListener('resize', () => {
-        chart.draw(data, options);
-    });
+    const color = d3.scaleOrdinal()
+        .domain(skillsData.map(d => d.type))
+        .range(d3.schemeSet2); // Brighter color palette
+
+    const pie = d3.pie()
+        .value(d => d.amount)
+        .sort(null);
+
+    const arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius);
+
+    // Tooltip setup
+    const tooltip = d3.select("body")
+        .append("div")
+        .attr("class", "chart-tooltip");
+
+    const arcs = svg.selectAll(".arc")
+        .data(pie(skillsData))
+        .enter()
+        .append("g")
+        .attr("class", "arc");
+
+    // Draw pie slices with hover effects
+    arcs.append("path")
+        .attr("d", arc)
+        .attr("fill", d => color(d.data.type))
+        .on("mouseover", (event, d) => {
+            tooltip
+                .html(`<strong>${d.data.type}</strong>: ${d.data.amount}`)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px")
+                .classed("show", true); // Show tooltip
+        })
+        .on("mousemove", (event) => {
+            tooltip
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", () => tooltip.classed("show", false)); // Hide tooltip
+
+    // Add labels inside pie slices
+    arcs.append("text")
+        .attr("transform", d => `translate(${arc.centroid(d)})`)
+        .attr("text-anchor", "middle")
+        .text(d => d.data.type);
 }
+
+
+
 // Load Google Charts library
 google.charts.load('current', { 'packages': ['corechart'] });
 google.charts.setOnLoadCallback(fetchUserData);

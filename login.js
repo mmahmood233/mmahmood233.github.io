@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMessage = document.getElementById('error-message');
 
     loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
+        e.preventDefault(); // Prevent page reload
+
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
@@ -13,13 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.error) {
                 throw new Error(response.error);
             }
+
+            // Save the token in localStorage
             localStorage.setItem('jwtToken', response);
-            showProfileView();
+
+            // Reload the page to reflect the updated state
+            window.location.reload();
         } catch (error) {
             errorMessage.textContent = error.message;
         }
     });
 });
+
 
 async function login(username, password) {
     const credentials = btoa(`${username}:${password}`);
