@@ -30,7 +30,7 @@ function checkAuthStatus() {
         loginView.style.display = 'none';
         profileView.style.display = 'block';
         logoutBtn.style.display = 'block';
-        fetchUserData(); // This will now be called every time we check auth status
+        fetchUserData(); 
     } else {
         loginView.style.display = 'block';
         profileView.style.display = 'none';

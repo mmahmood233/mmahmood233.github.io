@@ -32,7 +32,7 @@ async function fetchUserData() {
         return;
     }
 
-    const eventId = 20; // You might want to make this dynamic if needed
+    const eventId = 20; 
 
     const query = `
     query($userId: Int!, $eventId: Int!) {
@@ -302,16 +302,15 @@ function displayUserSkills(skills) {
                 .html(`<strong>${d.data.type}</strong>: ${d.data.amount}`)
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 20) + "px")
-                .classed("show", true); // Show tooltip
+                .classed("show", true); 
         })
         .on("mousemove", (event) => {
             tooltip
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 20) + "px");
         })
-        .on("mouseout", () => tooltip.classed("show", false)); // Hide tooltip
+        .on("mouseout", () => tooltip.classed("show", false)); 
 
-    // Add labels inside pie slices
     arcs.append("text")
         .attr("transform", d => `translate(${arc.centroid(d)})`)
         .attr("text-anchor", "middle")

@@ -353,8 +353,6 @@ h3 {
   }
 }
 
-
-/* Container for the SVG chart */
 #skillPolarChart {
   display: flex;
   justify-content: center;
@@ -370,10 +368,9 @@ h3 {
 }
 
 #skillPolarChart:hover {
-  transform: scale(1.03); /* Gentle zoom effect */
+  transform: scale(1.03);
 }
 
-/* Styling for the SVG chart text labels */
 .arc text {
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
@@ -381,21 +378,19 @@ h3 {
   font-weight: 600;
 }
 
-/* Pie slice hover effect */
 .arc path {
   transition: transform 0.5s, fill-opacity 0.3s;
   cursor: pointer;
-  stroke: #fff; /* Subtle border */
+  stroke: #fff;
   stroke-width: 2px;
 }
 
 .arc path:hover {
-  transform: scale(1.15); /* Strong zoom effect */
+  transform: scale(1.15); 
   fill-opacity: 0.85;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)); /* Nice shadow effect */
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)); 
 }
 
-/* Glassy tooltip style */
 .chart-tooltip {
   position: absolute;
   background: rgba(255, 255, 255, 0.8);
@@ -415,5 +410,5 @@ h3 {
 
 .chart-tooltip.show {
   opacity: 1;
-  transform: translateY(0); /* Smooth entrance */
+  transform: translateY(0); 
 }
